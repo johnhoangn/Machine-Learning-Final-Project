@@ -22,13 +22,13 @@ for j in batch_size:
         if i % j == 0:
             new_images.append(images[i])
             new_labels.append(labels[i])
-    clf = SGDClassifier(loss="hinge", penalty="l2", max_iter=200, tol=1e-3, learning_rate='constant', eta0=.1)
+    clf = SGDClassifier(loss="hinge", penalty="l2", max_iter=400, tol=1e-3, learning_rate='constant', eta0=.1)
     x_range2.append(len(new_images))
     clf.fit(new_images, new_labels)
     new_labels.clear()
     new_images.clear()
 
-    # training_time = time.time()
+    training_time = time.time()
 
     test_images, test_labels = mndata.load_testing()
 
@@ -56,22 +56,24 @@ average_array.clear()
 
 # Varying learning rate
 
-learning_rate = [.1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95, 1]
+ # learning_rate = [.1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6, .65, .7, .75, .8, .85, .9, .95, 1]
+  #learning_rate = [.1, .09, .08, .07, .06, .05, .04, .03, .02, .01, .001]
+learning_rate = [.001, .01, .02, .03, .04, .05, .06, .07, .08, .09, .1]
 for j in learning_rate:
-    for i in range(len(images)):
-        if i % 10 == 0:
-            new_images.append(images[i])
-            new_labels.append(labels[i])
-    clf = SGDClassifier(loss="hinge", penalty="l2", max_iter=200, tol=1e-3, learning_rate='constant', eta0=j)
-    # x_range2.append(len(new_images))
-    clf.fit(new_images, new_labels)
+     for i in range(len(images)):
+         if i % 10 == 0:
+             new_images.append(images[i])
+             new_labels.append(labels[i])
+     clf = SGDClassifier(loss="hinge", penalty="l2", max_iter=400, tol=1e-3, learning_rate='adaptive', eta0=j, n_jobs=-1)
+     # x_range2.append(len(new_images))
+     clf.fit(new_images, new_labels)
 
-    test_images, test_labels = mndata.load_testing()
+     test_images, test_labels = mndata.load_testing()
 
-    guesses = clf.predict(test_images)
-    array_sum = np.sum(guesses == test_labels)
-    average = array_sum/(len(guesses))
-    average_array.append(average)
+     guesses = clf.predict(test_images)
+     array_sum = np.sum(guesses == test_labels)
+     average = array_sum/(len(guesses))
+     average_array.append(average)
 plt.plot(learning_rate, average_array)
 
 plt.xlabel("Learning Rate")
